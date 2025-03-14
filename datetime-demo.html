@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DateTime</title>
+</head>
+<body>
+    <p id="timestamp"></p>
+    <script>
+        function updateTaskDateTime() {
+            const now = new Date();
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            const dayName = days[now.getDay()];
+            const monthName = months[now.getMonth()];
+            const date = now.getDate();
+            const year = now.getFullYear();
+            const time = now.toTimeString().split(' ')[0];
+            const formatted = `${dayName}, ${monthName} ${date}, ${year} - ${time}`;
+            document.getElementById("timestamp").innerText = formatted;
+        }
+        updateTaskDateTime(); // Initial call
+        setInterval(updateTaskDateTime, 1000); // Update every second
+    </script>
+</body>
+</html>
