@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PrizmaL GMT Time Settings</title>
+    <title>Gold Fighter GMT Time Settings</title>
     <style>
         * {
             margin: 0;
@@ -101,89 +101,60 @@
 </head>
 <body>
     <div class="container">
-        <h1>Gold Fighter GMT Time Settings</h1>
+        <h1>Gold Fighter Input Settings</h1>
         
         <div class="current-time">
-            <h2>Current Time</h2>
+            <h2>Current GMT Time</h2>
             <div class="time-display" id="current-time">Loading...</div>
-            <div class="gmt-display" id="current-gmt">Loading GMT Set...</div>
+            <div class="gmt-display" id="current-gmt">GMT+0</div>
         </div>
         
         <table id="time-table">
             <thead>
                 <tr>
                     <th>Broker Time</th>
-                    <th>GMT Offset</th>
+                    <th>GMT Input</th>
                 </tr>
             </thead>
             <tbody>
-                <tr data-hour="5"><td class="broker-time" id="time-5">Loading...</td><td class="gmt-set">+5</td></tr>
-                <tr data-hour="6"><td class="broker-time" id="time-6">Loading...</td><td class="gmt-set">+4</td></tr>
-                <tr data-hour="7"><td class="broker-time" id="time-7">Loading...</td><td class="gmt-set">+3</td></tr>
-                <tr data-hour="8"><td class="broker-time" id="time-8">Loading...</td><td class="gmt-set">+2</td></tr>
-                <tr data-hour="9"><td class="broker-time" id="time-9">Loading...</td><td class="gmt-set">+1</td></tr>
-                <tr data-hour="10"><td class="broker-time" id="time-10">Loading...</td><td class="gmt-set">0</td></tr>
-                <tr data-hour="11"><td class="broker-time" id="time-11">Loading...</td><td class="gmt-set">-1</td></tr>
-                <tr data-hour="12"><td class="broker-time" id="time-12">Loading...</td><td class="gmt-set">-2</td></tr>
-                <tr data-hour="13"><td class="broker-time" id="time-13">Loading...</td><td class="gmt-set">-3</td></tr>
-                <tr data-hour="14"><td class="broker-time" id="time-14">Loading...</td><td class="gmt-set">-4</td></tr>
-                <tr data-hour="15"><td class="broker-time" id="time-15">Loading...</td><td class="gmt-set">-5</td></tr>
-                <tr data-hour="16"><td class="broker-time" id="time-16">Loading...</td><td class="gmt-set">-6</td></tr>
-                <tr data-hour="17"><td class="broker-time" id="time-17">Loading...</td><td class="gmt-set">-7</td></tr>
-                <tr data-hour="18"><td class="broker-time" id="time-18">Loading...</td><td class="gmt-set">-8</td></tr>
-                <tr data-hour="19"><td class="broker-time" id="time-19">Loading...</td><td class="gmt-set">-9</td></tr>
-                <tr data-hour="20"><td class="broker-time" id="time-20">Loading...</td><td class="gmt-set">-10</td></tr>
-                <tr data-hour="21"><td class="broker-time" id="time-21">Loading...</td><td class="gmt-set">-11</td></tr>
-                <tr data-hour="22"><td class="broker-time" id="time-22">Loading...</td><td class="gmt-set">-12</td></tr>
-                <tr data-hour="23"><td class="broker-time" id="time-23">Loading...</td><td class="gmt-set">+11</td></tr>
-                <tr data-hour="0"><td class="broker-time" id="time-0">Loading...</td><td class="gmt-set">+10</td></tr>
-                <tr data-hour="1"><td class="broker-time" id="time-1">Loading...</td><td class="gmt-set">+9</td></tr>
-                <tr data-hour="2"><td class="broker-time" id="time-2">Loading...</td><td class="gmt-set">+8</td></tr>
-                <tr data-hour="3"><td class="broker-time" id="time-3">Loading...</td><td class="gmt-set">+7</td></tr>
-                <tr data-hour="4"><td class="broker-time" id="time-4">Loading...</td><td class="gmt-set">+6</td></tr>
+                <tr data-offset="0"><td class="broker-time" id="time-12">Loading...</td><td class="gmt-set">5</td></tr>
+                <tr data-offset="1"><td class="broker-time" id="time-11">Loading...</td><td class="gmt-set">4</td></tr>
+                <tr data-offset="2"><td class="broker-time" id="time-10">Loading...</td><td class="gmt-set">3</td></tr>
+                <tr data-offset="3"><td class="broker-time" id="time-9">Loading...</td><td class="gmt-set">2</td></tr>
+                <tr data-offset="4"><td class="broker-time" id="time-8">Loading...</td><td class="gmt-set">1 or 25</td></tr>
+                <tr data-offset="5"><td class="broker-time" id="time-7">Loading...</td><td class="gmt-set">0 or 24</td></tr>
+                <tr data-offset="6"><td class="broker-time" id="time-6">Loading...</td><td class="gmt-set">23</td></tr>
+                <tr data-offset="7"><td class="broker-time" id="time-5">Loading...</td><td class="gmt-set">22</td></tr>
+                <tr data-offset="8"><td class="broker-time" id="time-4">Loading...</td><td class="gmt-set">21</td></tr>
+                <tr data-offset="9"><td class="broker-time" id="time-3">Loading...</td><td class="gmt-set">20</td></tr>
+                <tr data-offset="10"><td class="broker-time" id="time-2">Loading...</td><td class="gmt-set">19</td></tr>
+                <tr data-offset="11"><td class="broker-time" id="time-1">Loading...</td><td class="gmt-set">18</td></tr>
+                <tr data-offset="12"><td class="broker-time" id="time-0">Loading...</td><td class="gmt-set">17</td></tr>
+                <tr data-offset="13"><td class="broker-time" id="time--1">Loading...</td><td class="gmt-set">16</td></tr>
+                <tr data-offset="14"><td class="broker-time" id="time--2">Loading...</td><td class="gmt-set">15</td></tr>
+                <tr data-offset="15"><td class="broker-time" id="time--3">Loading...</td><td class="gmt-set">14</td></tr>
+                <tr data-offset="16"><td class="broker-time" id="time--4">Loading...</td><td class="gmt-set">13</td></tr>
+                <tr data-offset="17"><td class="broker-time" id="time--5">Loading...</td><td class="gmt-set">12</td></tr>
+                <tr data-offset="18"><td class="broker-time" id="time--6">Loading...</td><td class="gmt-set">11</td></tr>
+                <tr data-offset="19"><td class="broker-time" id="time--7">Loading...</td><td class="gmt-set">10</td></tr>
+                <tr data-offset="20"><td class="broker-time" id="time--8">Loading...</td><td class="gmt-set">9</td></tr>
+                <tr data-offset="21"><td class="broker-time" id="time--9">Loading...</td><td class="gmt-set">8</td></tr>
+                <tr data-offset="22"><td class="broker-time" id="time--10">Loading...</td><td class="gmt-set">7</td></tr>
+                <tr data-offset="23"><td class="broker-time" id="time--11">Loading...</td><td class="gmt-set">6</td></tr>
             </tbody>
         </table>
     </div>
 
     <script>
-        // GMT offset values (in hours)
-        const gmtOffsetMap = {
-            0: 10,   // GMT+10
-            1: 9,    // GMT+9
-            2: 8,    // GMT+8
-            3: 7,    // GMT+7
-            4: 6,    // GMT+6
-            5: 5,    // GMT+5
-            6: 4,    // GMT+4
-            7: 3,    // GMT+3
-            8: 2,    // GMT+2
-            9: 1,    // GMT+1
-            10: 0,   // GMT+0
-            11: -1,  // GMT-1
-            12: -2,  // GMT-2
-            13: -3,  // GMT-3
-            14: -4,  // GMT-4
-            15: -5,  // GMT-5
-            16: -6,  // GMT-6
-            17: -7,  // GMT-7
-            18: -8,  // GMT-8
-            19: -9,  // GMT-9
-            20: -10, // GMT-10
-            21: -11, // GMT-11
-            22: -12, // GMT-12
-            23: 11   // GMT+11
-        };
-
         // Get DOM elements
         const currentTimeElement = document.getElementById('current-time');
-        const currentGMTElement = document.getElementById('current-gmt');
         const tableRows = document.querySelectorAll('#time-table tbody tr');
 
         // Function to format time
         function formatTime(date) {
-            const hours = date.getHours().toString().padStart(2, '0');
-            const minutes = date.getMinutes().toString().padStart(2, '0');
-            const seconds = date.getSeconds().toString().padStart(2, '0');
+            const hours = date.getUTCHours().toString().padStart(2, '0');
+            const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+            const seconds = date.getUTCSeconds().toString().padStart(2, '0');
             return `${hours}:${minutes}:${seconds}`;
         }
 
@@ -191,30 +162,23 @@
         function updateTime() {
             // Get current UTC time
             const nowUTC = new Date();
-            const localTime = new Date();
-            const currentHour = localTime.getHours();
-
-            // Update current local time display
-            currentTimeElement.textContent = formatTime(localTime);
             
-            // Calculate local GMT offset
-            const localOffset = -localTime.getTimezoneOffset() / 60;
-            currentGMTElement.textContent = `GMT Offset: ${localOffset >= 0 ? '+' : ''}${localOffset}`;
+            // Update current GMT time display (always GMT+0)
+            currentTimeElement.textContent = formatTime(nowUTC);
 
-            // Update all broker times and highlight active row
+            // Update all broker times
             tableRows.forEach(row => {
-                const hour = parseInt(row.dataset.hour);
-                const gmtOffset = gmtOffsetMap[hour];
+                const offset = parseInt(row.dataset.offset);
                 
                 // Calculate broker time from UTC
                 const brokerTime = new Date(nowUTC);
-                brokerTime.setHours(brokerTime.getUTCHours() + gmtOffset);
+                brokerTime.setUTCHours(brokerTime.getUTCHours() + offset);
                 
                 const timeElement = row.querySelector('.broker-time');
                 timeElement.textContent = formatTime(brokerTime);
 
-                // Highlight row matching local time's hour
-                row.classList.toggle('active', hour === currentHour);
+                // Highlight row matching GMT+2 (offset = 3)
+                row.classList.toggle('active', offset === 3);
             });
         }
 
