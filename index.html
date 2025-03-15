@@ -17,7 +17,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background-color: #f9f9f9;
+            background-color: #000000; /* Black from the German flag */
             padding: 20px;
         }
         
@@ -29,67 +29,76 @@
         h1 {
             text-align: center;
             margin-bottom: 30px;
-            color: #333;
+            color: #FFCE00; /* Gold/yellow from the German flag */
         }
         
         .current-time {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 100px; /* Kept the increased margin for spacing */
             padding: 15px;
-            background-color: #fff;
+            background-color: #1a1a1a; /* Slightly lighter black for contrast */
             border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
         }
         
         .current-time h2 {
             margin-bottom: 10px;
-            color: #333;
+            color: #FFCE00; /* Gold/yellow */
         }
         
         .time-display {
             font-size: 24px;
             font-weight: bold;
-            color: #333;
+            color: #FF0000; /* Red for the time display */
         }
         
         .gmt-display {
             font-size: 20px;
-            color: #0066cc;
+            color: #ffffff; /* White for readability */
             margin-top: 10px;
+            margin-bottom: 10px;
         }
         
         table {
             width: 100%;
+            margin-top: 20px;
             border-collapse: collapse;
-            background-color: white;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            background-color: #1a1a1a; /* Slightly lighter black */
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
         }
         
         th {
-            background-color: #f2f2f2;
-            color: #333;
+            background-color: #333333; /* Dark gray for the header */
+            color: #FFCE00; /* Gold/yellow for the header text */
             font-weight: bold;
             text-align: center;
             padding: 12px;
-            border: 1px solid #ddd;
+            border: 1px solid #4a4a4a; /* Dark border */
         }
         
         td {
             padding: 10px;
             text-align: center;
-            border: 1px solid #ddd;
+            border: 1px solid #4a4a4a;
+            color: #ffffff; /* White for readability */
         }
         
         tr.active {
-            background-color: #e6ffe6;
+            background-color: #FF0000; /* Red for the highlighted row */
         }
         
         .broker-time {
-            color: #000;
+            color: #ffffff; /* White for the broker time text */
         }
         
         .gmt-set {
             font-weight: bold;
+            color: #FFCE00; /* Gold/yellow for the GMT input values */
+        }
+
+        /* Ensure the GMT Input text is visible on the highlighted row */
+        tr.active .gmt-set {
+            color: #000000; /* Black to contrast with the red highlighted background */
         }
 
         .seconds {
@@ -97,23 +106,36 @@
             min-width: 25px;
             text-align: left;
         }
+
+        /* Optional: Add a hover effect to indicate clickable rows */
+        tbody tr:hover {
+            background-color: #4a4a4a; /* Slightly lighter gray for hover effect */
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Gold Fighter Input Settings</h1>
+        <h1 style="margin-bottom: 10px; font-size: 40px; color: #FFCE00;">Gold Fighter Input Settings</h1>
         
-        <div class="current-time">
-            <h2>Current GMT Time</h2>
-            <div class="time-display" id="current-time">Loading...</div>
-            <div class="gmt-display" id="current-gmt">GMT+0</div>
+        <div class="current-time" style="text-align: left; padding: 20px; background: #1a1a1a; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.5); max-width: 500px; margin: auto;">
+            <h2 style="margin-bottom: 10px; color: #FFCE00;">Current GMT Time</h2>
+            <div class="time-display" id="current-time" style="font-size: 28px; font-weight: bold; margin-bottom: 15px;">02:23:53</div>
+            
+            <div class="gmt-display" id="current-gmt" style="color: #ffffff; font-size: 16px; line-height: 1.6;">
+                <strong>How to use:</strong><br>
+                1. Press <strong>Ctrl + M</strong> in MT4/MT5 to open <strong>Market Watch</strong>.<br>
+                2. Check the <strong>Market Watch time</strong>.<br>
+                3. Match it with the <strong>Broker Time</strong> below.<br>
+                4. Enter the corresponding <strong>GMT Input</strong> in your EA settings.
+            </div>
         </div>
-        
+
         <table id="time-table">
             <thead>
                 <tr>
                     <th>Broker Time</th>
-                    <th>GMT Input</th>
+                    <th>EA GMT Input</th>
                 </tr>
             </thead>
             <tbody>
@@ -158,7 +180,7 @@
             return `${hours}:${minutes}:${seconds}`;
         }
 
-        // Function to update the time and highlight the correct row
+        // Function to update the time
         function updateTime() {
             // Get current UTC time
             const nowUTC = new Date();
@@ -176,11 +198,19 @@
                 
                 const timeElement = row.querySelector('.broker-time');
                 timeElement.textContent = formatTime(brokerTime);
-
-                // Highlight row matching GMT+2 (offset = 3)
-                row.classList.toggle('active', offset === 3);
             });
         }
+ 	// Set the default highlighted row (row 4, index 3)
+        tableRows[3].classList.add('active');
+        // Add click event listeners to each row
+        tableRows.forEach(row => {
+            row.addEventListener('click', () => {
+                // Remove the 'active' class from all rows
+                tableRows.forEach(r => r.classList.remove('active'));
+                // Add the 'active' class to the clicked row
+                row.classList.add('active');
+            });
+        });
 
         // Update time immediately and then every second
         updateTime();
