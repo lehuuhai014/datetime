@@ -144,12 +144,10 @@
                 </tr>
             </thead>
             <tbody>
-                <tr data-offset="0"><td class="broker-time" id="time-12">Loading...</td><td class="gmt-set">5</td></tr>
-                <tr data-offset="1"><td class="broker-time" id="time-11">Loading...</td><td class="gmt-set">4</td></tr>
                 <tr data-offset="2"><td class="broker-time" id="time-10">Loading...</td><td class="gmt-set">3</td></tr>
                 <tr data-offset="3"><td class="broker-time" id="time-9">Loading...</td><td class="gmt-set">2</td></tr>
-                <tr data-offset="4"><td class="broker-time" id="time-8">Loading...</td><td class="gmt-set">1 or 25</td></tr>
-                <tr data-offset="5"><td class="broker-time" id="time-7">Loading...</td><td class="gmt-set">0 or 24</td></tr>
+                <tr data-offset="4"><td class="broker-time" id="time-8">Loading...</td><td class="gmt-set">1</td></tr>
+                <tr data-offset="5"><td class="broker-time" id="time-7">Loading...</td><td class="gmt-set">0</td></tr>
                 <tr data-offset="6"><td class="broker-time" id="time-6">Loading...</td><td class="gmt-set">23</td></tr>
                 <tr data-offset="7"><td class="broker-time" id="time-5">Loading...</td><td class="gmt-set">22</td></tr>
                 <tr data-offset="8"><td class="broker-time" id="time-4">Loading...</td><td class="gmt-set">21</td></tr>
@@ -168,6 +166,8 @@
                 <tr data-offset="21"><td class="broker-time" id="time--9">Loading...</td><td class="gmt-set">8</td></tr>
                 <tr data-offset="22"><td class="broker-time" id="time--10">Loading...</td><td class="gmt-set">7</td></tr>
                 <tr data-offset="23"><td class="broker-time" id="time--11">Loading...</td><td class="gmt-set">6</td></tr>
+                <tr data-offset="0"><td class="broker-time" id="time-12">Loading...</td><td class="gmt-set">5</td></tr>
+                <tr data-offset="1"><td class="broker-time" id="time-11">Loading...</td><td class="gmt-set">4</td></tr>
             </tbody>
         </table>
     </div>
@@ -206,7 +206,7 @@
             });
         }
         // Set the default highlighted row (row 4, index 3)
-        tableRows[3].classList.add('active');
+        tableRows[1].classList.add('active');
         // Add click event listeners to each row
         tableRows.forEach(row => {
             row.addEventListener('click', () => {
