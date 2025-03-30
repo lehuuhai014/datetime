@@ -57,12 +57,99 @@
             border-radius: 5px;
             margin: 20px 0;
         }
+        
+        /* Countdown Styles */
+        .countdown-container {
+            text-align: center;
+            background: #fff8e1;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+            margin: 20px auto;
+            max-width: 350px;
+            border: 1px solid #ffeb3b;
+        }
+        
+        .countdown-title {
+            font-size: 24px;
+            color: #111;
+            margin-bottom: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .progress-container {
+            position: relative;
+            margin-bottom: 30px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ffb300, #ffca28);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+        
+        .counter {
+            font-size: 48px;
+            color: #ffb300;
+            font-weight: 700;
+            margin: 20px 0;
+        }
+        
+        .fraction {
+            font-size: 18px;
+            color: #555;
+            font-weight: 500;
+            position: absolute;
+            right: 0;
+            top: -25px;
+        }
+        
+        .status {
+            font-size: 16px;
+            color: #333;
+            margin-top: 15px;
+            font-style: italic;
+        }
+        
+        .info {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #777;
+            background: #fffde7;
+            padding: 8px 12px;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
     <h1>EA Gold Fighter MT5 Promotion - Opportunity to Receive an FTMO Account!</h1>
 
     <p>Esteemed traders, we extend a warm welcome to a distinguished promotional event dedicated to the Expert Advisor, Gold Fighter MT5! In profound appreciation for the patronage of our valued clients and in anticipation of welcoming new participants, we are conducting a fortunate draw with the esteemed grand prize of the FTMO Challenge Fee, encompassing a total of 8 highly valuable awards!</p>
+
+    <div class="countdown-container">
+        <div class="countdown-title">Registration Progress</div>
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="fraction" id="fraction-counter">0/50</div>
+        </div>
+        <div class="counter" id="main-counter">0</div>
+        <div class="status">New Purchases</div>
+        <div class="info" id="percentage-info">0% of registration complete</div>
+    </div>
 
     <hr>
 
@@ -76,7 +163,7 @@
 
     <p><span class="prize-emoji">🥉</span><strong>Third Prize:</strong> Two (02) prizes, each consisting of one (01) FTMO account challenge fee valued at $50,000 (Worth $379 per prize)</p>
 
-    <p><span class="prize-emoji">🏅</span><strong>Fourth Prize:</strong Annotation Three (03) prizes, each consisting of one (01) FTMO account challenge fee valued at $25,000 (Worth $274 per prize)</p>
+    <p><span class="prize-emoji">🏅</span><strong>Fourth Prize:</strong> Three (03) prizes, each consisting of one (01) FTMO account challenge fee valued at $25,000 (Worth $274 per prize)</p>
 
     <p>The total value of the prizes reaches an impressive $3953! This presents an exceptional opportunity for you to acquire a substantial funded account without incurring initial expenses.</p>
 
@@ -194,71 +281,85 @@
         <li>Participants must comply with the regulations of MQL5 and FTMO.</li>
     </ul>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const tableBody = document.getElementById('participants-body');
-        
-        // Use the raw GitHub URL
-        const csvUrl = 'https://raw.githubusercontent.com/lehuuhai014/datetime/main/listUsers.csv';
-        
-        // Automatically fetch the CSV when the page loads
-        fetchCSV();
-        
-        function fetchCSV() {
-            fetch(csvUrl)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.text();
-                })
-                .then(csvData => {
-                    parseCSV(csvData);
-                })
-                .catch(error => {
-                    console.error('Error fetching CSV:', error);
-                    tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Error loading participants list</td></tr>';
-                });
-        }
-        
-        function parseCSV(csvData) {
-            const lines = csvData.split(/\r\n|\n/);
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tableBody = document.getElementById('participants-body');
+            const progressFill = document.getElementById('progress-fill');
+            const fractionCounter = document.getElementById('fraction-counter');
+            const mainCounter = document.getElementById('main-counter');
+            const percentageInfo = document.getElementById('percentage-info');
             
-            if (lines.length < 2) {
-                tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">CSV file is empty or invalid</td></tr>';
-                return;
+            const csvUrl = 'https://raw.githubusercontent.com/lehuuhai014/datetime/main/listUsers.csv';
+            
+            // Fetch CSV initially
+            fetchCSV();
+            
+            // Poll every 30 seconds for updates
+            setInterval(fetchCSV, 30000);
+            
+            function fetchCSV() {
+                fetch(csvUrl)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        return response.text();
+                    })
+                    .then(csvData => parseCSV(csvData))
+                    .catch(error => {
+                        console.error('Error fetching CSV:', error);
+                        tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Error loading participants list</td></tr>';
+                    });
             }
             
-            const dataRows = lines.slice(1).filter(line => line.trim() !== '');
-            
-            tableBody.innerHTML = '';
-            
-            if (dataRows.length === 0) {
-                const row = document.createElement('tr');
-                row.innerHTML = '<td colspan="5" style="text-align: center;">No participants data found in CSV</td>';
-                tableBody.appendChild(row);
-                return;
-            }
-            
-            dataRows.forEach((line, index) => {
-                const columns = line.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || [];
-                
-                if (columns.length > 0) {
-                    const row = document.createElement('tr');
-                    
-                    for (let i = 0; i < 5; i++) {
-                        const cell = document.createElement('td');
-                        let value = i < columns.length ? columns[i] : '';
-                        value = value.replace(/^"(.*)"$/, '$1');
-                        cell.textContent = value;
-                        row.appendChild(cell);
-                    }
-                    
-                    tableBody.appendChild(row);
+            function parseCSV(csvData) {
+                const lines = csvData.split(/\r\n|\n/).filter(line => line.trim() !== '');
+                if (lines.length < 2) {
+                    tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">CSV file is empty or invalid</td></tr>';
+                    return;
                 }
-            });
-        }
-    });
-</script>
+                
+                const dataRows = lines.slice(1); // Skip header
+                tableBody.innerHTML = '';
+                
+                if (dataRows.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No participants data found in CSV</td></tr>';
+                    return;
+                }
+                
+                // Filter rows where the "Note" column (index 3) starts with "New Order #"
+                const newOrderRows = dataRows.filter(line => {
+                    const columns = line.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || [];
+                    const note = columns[3] ? columns[3].replace(/^"(.*)"$/, '$1') : '';
+                    return note.startsWith('New Order #');
+                });
+                
+                const totalCount = newOrderRows.length; // Only count "New Order #" rows
+                const maxCount = 50;
+                const currentCount = Math.min(totalCount, maxCount);
+                const percentage = (currentCount / maxCount * 100).toFixed(0);
+                
+                // Update countdown
+                fractionCounter.textContent = `${currentCount}/${maxCount}`;
+                mainCounter.textContent = currentCount;
+                progressFill.style.width = `${percentage}%`;
+                percentageInfo.textContent = `${percentage}% of registration complete`;
+                
+                // Populate table with all rows (not filtered)
+                dataRows.forEach((line, index) => {
+                    const columns = line.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || [];
+                    if (columns.length > 0) {
+                        const row = document.createElement('tr');
+                        for (let i = 0; i < 5; i++) {
+                            const cell = document.createElement('td');
+                            let value = i < columns.length ? columns[i] : '';
+                            value = value.replace(/^"(.*)"$/, '$1');
+                            cell.textContent = value;
+                            row.appendChild(cell);
+                        }
+                        tableBody.appendChild(row);
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
