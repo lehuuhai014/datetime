@@ -194,71 +194,71 @@
         <li>Participants must comply with the regulations of MQL5 and FTMO.</li>
     </ul>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const tableBody = document.getElementById('participants-body');
-            
-            // Replace this URL with your actual GitHub repository raw file URL
-            const csvUrl = 'https://github.com/lehuuhai014/datetime/blob/main/listUsers.csv';
-
-            // Automatically fetch the CSV when the page loads
-            fetchCSV();
-            
-            function fetchCSV() {
-                fetch(csvUrl)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.text();
-                    })
-                    .then(csvData => {
-                        parseCSV(csvData);
-                    })
-                    .catch(error => {
-                        console.error('Error fetching CSV:', error);
-                        tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Error loading participants list</td></tr>';
-                    });
-            }
-            
-            function parseCSV(csvData) {
-                const lines = csvData.split(/\r\n|\n/);
-                
-                if (lines.length < 2) {
-                    tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">CSV file is empty or invalid</td></tr>';
-                    return;
-                }
-                
-                const dataRows = lines.slice(1).filter(line => line.trim() !== '');
-                
-                tableBody.innerHTML = '';
-                
-                if (dataRows.length === 0) {
-                    const row = document.createElement('tr');
-                    row.innerHTML = '<td colspan="5" style="text-align: center;">No participants data found in CSV</td>';
-                    tableBody.appendChild(row);
-                    return;
-                }
-                
-                dataRows.forEach((line, index) => {
-                    const columns = line.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || [];
-                    
-                    if (columns.length > 0) {
-                        const row = document.createElement('tr');
-                        
-                        for (let i = 0; i < 5; i++) {
-                            const cell = document.createElement('td');
-                            let value = i < columns.length ? columns[i] : '';
-                            value = value.replace(/^"(.*)"$/, '$1');
-                            cell.textContent = value;
-                            row.appendChild(cell);
-                        }
-                        
-                        tableBody.appendChild(row);
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const tableBody = document.getElementById('participants-body');
+        
+        // Use the raw GitHub URL
+        const csvUrl = 'https://raw.githubusercontent.com/lehuuhai014/datetime/main/listUsers.csv';
+        
+        // Automatically fetch the CSV when the page loads
+        fetchCSV();
+        
+        function fetchCSV() {
+            fetch(csvUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
                     }
+                    return response.text();
+                })
+                .then(csvData => {
+                    parseCSV(csvData);
+                })
+                .catch(error => {
+                    console.error('Error fetching CSV:', error);
+                    tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Error loading participants list</td></tr>';
                 });
+        }
+        
+        function parseCSV(csvData) {
+            const lines = csvData.split(/\r\n|\n/);
+            
+            if (lines.length < 2) {
+                tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">CSV file is empty or invalid</td></tr>';
+                return;
             }
-        });
-    </script>
+            
+            const dataRows = lines.slice(1).filter(line => line.trim() !== '');
+            
+            tableBody.innerHTML = '';
+            
+            if (dataRows.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="5" style="text-align: center;">No participants data found in CSV</td>';
+                tableBody.appendChild(row);
+                return;
+            }
+            
+            dataRows.forEach((line, index) => {
+                const columns = line.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || [];
+                
+                if (columns.length > 0) {
+                    const row = document.createElement('tr');
+                    
+                    for (let i = 0; i < 5; i++) {
+                        const cell = document.createElement('td');
+                        let value = i < columns.length ? columns[i] : '';
+                        value = value.replace(/^"(.*)"$/, '$1');
+                        cell.textContent = value;
+                        row.appendChild(cell);
+                    }
+                    
+                    tableBody.appendChild(row);
+                }
+            });
+        }
+    });
+</script>
 </body>
 </html>
