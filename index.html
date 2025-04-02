@@ -598,35 +598,80 @@
         </footer>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const tableBody = document.getElementById('participants-body');
-            const progressFill = document.getElementById('progress-fill');
-            const fractionCounter = document.getElementById('fraction-counter');
-            const mainCounter = document.getElementById('main-counter');
-            const percentageInfo = document.getElementById('percentage-info');
-            
-            const csvUrl = 'https://raw.githubusercontent.com/lehuuhai014/datetime/main/listUsers.csv';
-            
-            // Fetch CSV initially
-            fetchCSV();
-            
-            // Poll every 30 seconds for updates
-            setInterval(fetchCSV, 30000);
-            
-            function fetchCSV() {
-                fetch(csvUrl)
-                    .then(response => {
-                        if (!response.ok) throw new Error('Network response was not ok');
-                        return response.text();
-                    })
-                    .then(csvData => parseCSV(csvData))
-                    .catch(error => {
-                        console.error('Error fetching CSV:', error);
-                        tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Error loading participants list</td></tr>';
-                    });
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const tableBody = document.getElementById('participants-body');
+        const progressFill = document.getElementById('progress-fill');
+        const fractionCounter = document.getElementById('fraction-counter');
+        const mainCounter = document.getElementById('main-counter');
+        const percentageInfo = document.getElementById('percentage-info');
+        
+        const csvUrl = 'https://raw.githubusercontent.com/lehuuhai014/datetime/main/listUsers.csv';
+        
+        // Fetch CSV initially
+        fetchCSV();
+        
+        // Poll every 30 seconds for updates
+        setInterval(fetchCSV, 30000);
+        
+        function fetchCSV() {
+            fetch(csvUrl)
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.text();
+                })
+                .then(csvData => parseCSV(csvData))
+                .catch(error => {
+                    console.error('Error fetching CSV:', error);
+                    tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Error loading participants list</td></tr>';
+                });
+        }
+        
+        function parseCSV(csvData) {
+            // Split into lines and filter out empty lines
+            const lines = csvData.trim().split('\n');
+            if (lines.length < 2) {
+                tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No participants yet</td></tr>';
+                updateProgress(0);
+                return;
             }
-            
-            function parseCSV(csvData) {
-                const lines = csvData.split(/\r\n|\n/).filter(line => line.trim() !== '');
-                if (lines.length < 2) {
+
+            // Get headers and data rows
+            const headers = lines[0].split(',').map(header => header.trim());
+            const rows = lines.slice(1).map(line => {
+                const values = line.split(',').map(value => value.trim());
+                return headers.reduce((obj, header, index) => {
+                    obj[header] = values[index] || '';
+                    return obj;
+                }, {});
+            });
+
+            // Update table
+            tableBody.innerHTML = '';
+            rows.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${row['Items No'] || (index + 1)}</td>
+                    <td>${row['Identifier'] || ''}</td>
+                    <td>${row['Status'] || ''}</td>
+                    <td>${row['Note'] || ''}</td>
+                    <td>${row['Prize'] || ''}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+
+            // Calculate and update progress
+            const newPurchases = rows.filter(row => row['Note'].includes('New Order')).length;
+            const totalSlots = 50;
+            updateProgress(newPurchases, totalSlots);
+        }
+
+        function updateProgress(current, total = 50) {
+            const percentage = Math.min((current / total) * 100, 100);
+            progressFill.style.width = `${percentage}%`;
+            fractionCounter.textContent = `${current}/${total}`;
+            mainCounter.textContent = current;
+            percentageInfo.textContent = `${Math.round(percentage)}% of registration complete`;
+        }
+    });
+</script>
