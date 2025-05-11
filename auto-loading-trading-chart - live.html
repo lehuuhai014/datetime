@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EA Gold Fighter MT5</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/2.1.0/chartjs-plugin-annotation.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to right, #0f0c29, #1a1541, #24243e);
+            color: #fff;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+        }
+        
+        h1 {
+            color: #9370ff;
+            font-size: 36px;
+            margin-bottom: 5px;
+        }
+        
+        h2 {
+            font-size: 18px;
+            font-weight: normal;
+            margin-top: 0;
+        }
+        
+        .chart-container {
+            background-color: rgba(15, 14, 35, 0.7);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .chart-title {
+            color: #ffd700;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .loading-status {
+            text-align: center;
+            margin: 20px 0;
+            padding: 10px;
+            background-color: rgba(15, 14, 35, 0.7);
+            border-radius: 5px;
+        }
+        
+        .stats-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        
+        .stat-box {
+            background-color: rgba(15, 14, 35, 0.7);
+            border-radius: 8px;
+            padding: 15px;
+            width: calc(25% - 15px);
+            margin-bottom: 15px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .stat-box h4 {
+            margin-top: 0;
+            color: #9370ff;
+        }
+        
+        .stat-box p {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 10px;
+            font-size: 14px;
+            color: #aaa;
+        }
+        
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 15px;
+        }
+        
+        .legend-color {
+            width: 15px;
+            height: 15px;
+            margin-right: 5px;
+            border-radius: 2px;
+        }
+        
+        .custom-legend {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            padding: 10px;
+            background-color: rgba(0,0,0,0.2);
+            border-radius: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .stat-box {
+                width: calc(50% - 10px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>EA Gold Fighter MT5</h1>
+            <h2>Strategy Performance Monitor</h2>
+        </header>
+        
+        <div class="loading-status" id="loading-status">
+            Loading data files...
+        </div>
+        
+        <div class="stats-container">
+            <div class="stat-box">
+                <h4>Trades</h4>
+                <p id="total-trades">Total: 0</p>
+                <p id="is-trades">IS: 0</p>
+                <p id="oos-trades">OOS: 0</p>
+            </div>
+            <div class="stat-box">
+                <h4>Profit</h4>
+                <p id="total-profit">Total: $0.00</p>
+                <p id="is-profit">IS: $0.00</p>
+                <p id="oos-profit">OOS: $0.00</p>
+            </div>
+
+            <div class="stat-box">
+                <h4>Win Rate</h4>
+                <p id="total-win-rate">Total: 0%</p>
+                <p id="is-win-rate">IS: 0%</p>
+                <p id="oos-win-rate">OOS: 0%</p>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <h3 class="chart-title">Performance Chart</h3>
+            <div class="custom-legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #00D0FF;"></div>
+                    <span>Backtest (IS)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #FFD700;"></div>
+                    <span>Live Trading (OOS)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #FF3333;"></div>
+                    <span>IS/OOS Boundary</span>
+                </div>
+            </div>
+            <canvas id="performanceChart"></canvas>
+        </div>
+        
+        <footer>
+        </footer>
+    </div>
+
+    <script>
+        let performanceChart;
+        
+        function initChart(labels, isData, oosData, isBalance, oosBalance, transitionIndex) {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            
+            if (performanceChart) {
+                performanceChart.destroy();
+            }
+            
+            // Register the annotation plugin if not already registered
+            if (!Chart.registry.getPlugin('annotation')) {
+                Chart.register(ChartAnnotation);
+            }
+            
+            performanceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Backtest (IS)',
+                            data: isBalance,
+                            borderColor: '#00D0FF',
+                            backgroundColor: 'rgba(0, 208, 255, 0.1)',
+                            borderWidth: 2,
+                            stepped: 'after',
+                            fill: false,
+                            pointRadius: 0,
+                            pointHoverRadius: 0,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Live Trading (OOS)',
+                            data: oosBalance,
+                            borderColor: '#FFD700',
+                            backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                            borderWidth: 2,
+                            stepped: 'after',
+                            fill: false,
+                            pointRadius: 0,
+                            pointHoverRadius: 0,
+                            yAxisID: 'y'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                 scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'Account Balance ($)',
+                                color: '#fff'
+                            },
+                            ticks: {
+                                color: '#aaa'
+                            },
+                            grid: {
+                                display: false // Disable y-axis grid
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Time',
+                                color: '#fff'
+                            },
+                            ticks: {
+                                color: '#aaa',
+                                maxRotation: 45,
+                                minRotation: 45
+                            },
+                            grid: {
+                                display: false // Disable x-axis grid
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false // Hide the default legend, we'll use our custom one
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += new Intl.NumberFormat('en-US', { 
+                                            style: 'currency', 
+                                            currency: 'USD' 
+                                        }).format(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
+                        annotation: {
+                            annotations: {}
+                        }
+                    },
+                    animation: {
+                        duration: 2000
+                    }
+                }
+            });
+            
+            // Only add the annotation if we have a valid transition point (when OOS data exists)
+            if (transitionIndex >= 0 && transitionIndex < labels.length) {
+                // Add vertical line annotation at the IS/OOS boundary
+                performanceChart.options.plugins.annotation = {
+                    annotations: {
+                        line1: {
+                            type: 'line',
+                            xMin: transitionIndex,
+                            xMax: transitionIndex,
+                            borderColor: '#FF3333',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            label: {
+                                display: true,
+                                content: 'Live begin',
+                                position: 'top',
+                                backgroundColor: '#FF3333',
+                                color: '#fff',
+                                font: {
+                                    weight: 'bold'
+                                },
+                                padding: 5,
+                                xAdjust: 0,
+                                yAdjust: -15
+                            }
+                        },
+                        isLabel: {
+                            type: 'label',
+                            xValue: Math.max(0, Math.floor(transitionIndex / 2)),
+                            yValue: 'max',
+                            backgroundColor: 'rgba(0, 208, 255, 0.4)',
+                            content: 'IS',
+                            font: {
+                                size: 18,
+                                weight: 'bold'
+                            },
+                            color: '#fff',
+                            padding: 8
+                        },
+                        oosLabel: {
+                            type: 'label',
+                            xValue: Math.floor((labels.length + transitionIndex) / 1.75),
+                            yValue: 'max',
+                            backgroundColor: 'rgba(255, 215, 0, 0.4)',
+                            content: 'OOS',
+                            font: {
+                                size: 18,
+                                weight: 'bold'
+                            },
+                            color: '#fff',
+                            padding: 8
+                        }
+                    }
+                };
+                performanceChart.update();
+            }
+            
+            document.getElementById('performanceChart').parentNode.style.height = '500px';
+        }
+        
+        function processData(isData, oosData) {
+            isData.sort((a, b) => new Date(a['Open time']) - new Date(b['Open time']));
+            oosData.sort((a, b) => new Date(a['Open time']) - new Date(b['Open time']));
+            
+            let isBalance = [10000];
+            let oosBalance = [];
+            let dates = [];
+            let transitionIndex = -1;
+            
+            isData.forEach((trade) => {
+                const date = trade['Close time'];
+                dates.push(formatDate(date));
+                const profit = parseFloat(trade['P/L in money']);
+                isBalance.push(isBalance[isBalance.length - 1] + profit);
+            });
+            
+            if (oosData.length > 0) {
+                // Store the index where the transition from IS to OOS occurs
+                transitionIndex = dates.length;
+                
+                const lastIsBalance = isBalance[isBalance.length - 1];
+                oosBalance = Array(isBalance.length - 1).fill(null);
+                oosBalance.push(lastIsBalance);
+                
+                oosData.forEach((trade) => {
+                    const date = trade['Close time'];
+                    dates.push(formatDate(date));
+                    const profit = parseFloat(trade['P/L in money']);
+                    oosBalance.push(oosBalance[oosBalance.length - 1] + profit);
+                });
+                
+                while (isBalance.length < dates.length) {
+                    isBalance.push(null);
+                }
+            }
+            
+            // Trades
+            const totalTrades = isData.length + oosData.length;
+            const isTrades = isData.length;
+            const oosTrades = oosData.length;
+            
+            // Profit
+            const totalProfit = [...isData, ...oosData].reduce((sum, trade) => sum + parseFloat(trade['P/L in money']), 0);
+            const isProfit = isData.reduce((sum, trade) => sum + parseFloat(trade['P/L in money']), 0);
+            const oosProfit = oosData.reduce((sum, trade) => sum + parseFloat(trade['P/L in money']), 0);
+
+            // Win Rate
+            const totalWinTrades = [...isData, ...oosData].filter(trade => parseFloat(trade['P/L in money']) > 0).length;
+            const isWinTrades = isData.filter(trade => parseFloat(trade['P/L in money']) > 0).length;
+            const oosWinTrades = oosData.filter(trade => parseFloat(trade['P/L in money']) > 0).length;
+            const totalWinRate = totalTrades > 0 ? (totalWinTrades / totalTrades * 100).toFixed(2) : 0;
+            const isWinRate = isTrades > 0 ? (isWinTrades / isTrades * 100).toFixed(2) : 0;
+            const oosWinRate = oosTrades > 0 ? (oosWinTrades / oosTrades * 100).toFixed(2) : 0;
+            
+            // Update Trades
+            document.getElementById('total-trades').textContent = `Total: ${totalTrades}`;
+            document.getElementById('is-trades').textContent = `IS: ${isTrades}`;
+            document.getElementById('oos-trades').textContent = `OOS: ${oosTrades}`;
+            
+            // Update Profit
+            document.getElementById('total-profit').textContent = `Total: ${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(totalProfit)}`;
+            document.getElementById('is-profit').textContent = `IS: ${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(isProfit)}`;
+            document.getElementById('oos-profit').textContent = `OOS: ${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(oosProfit)}`;
+            
+            // Update Win Rate
+            document.getElementById('total-win-rate').textContent = `Total: ${totalWinRate}%`;
+            document.getElementById('is-win-rate').textContent = `IS: ${isWinRate}%`;
+            document.getElementById('oos-win-rate').textContent = `OOS: ${oosWinRate}%`;
+            
+            initChart(dates, isData, oosData, isBalance, oosBalance.length > 0 ? oosBalance : [], transitionIndex);
+            
+            // Update loading status
+            document.getElementById('loading-status').textContent = 'Data loaded successfully!';
+            document.getElementById('loading-status').style.backgroundColor = 'rgba(50, 205, 50, 0.3)';
+        }
+        
+        function formatDate(dateString) {
+            if (!dateString || typeof dateString !== 'string') {
+                return 'Invalid Date';
+            }
+            const datePattern = /^(\d{2})\.(\d{2})\.(\d{4})\s(\d{2}):(\d{2}):(\d{2})$/;
+            const match = dateString.match(datePattern);
+            if (!match) {
+                return 'Invalid Date';
+            }
+            const [, day, month, year, hours, minutes, seconds] = match;
+            const date = new Date(year, month - 1, day, hours, minutes, seconds);
+            if (isNaN(date.getTime())) {
+                return 'Invalid Date';
+            }
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            return `${months[date.getMonth()]}-${date.getFullYear()}`;
+        }
+        
+        function processCSV(file, isOOS = false) {
+            return new Promise((resolve, reject) => {
+                Papa.parse(file, {
+                    header: true,
+                    dynamicTyping: true,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        if (results.data.length > 0) {
+                            resolve(results.data);
+                        } else {
+                            reject('No data found in CSV file.');
+                        }
+                    },
+                    error: function(error) {
+                        reject('Error reading CSV file: ' + error);
+                    }
+                });
+            });
+        }
+        
+        // Function to load CSV files via fetch
+        async function loadCSVFile(fileName) {
+            try {
+                const response = await fetch(fileName);
+                if (!response.ok) {
+                    throw new Error(`Failed to load ${fileName}: ${response.status} ${response.statusText}`);
+                }
+                const csvText = await response.text();
+                return csvText;
+            } catch (error) {
+                console.error(`Error loading ${fileName}:`, error);
+                document.getElementById('loading-status').textContent = `Error loading ${fileName}: ${error.message}`;
+                document.getElementById('loading-status').style.backgroundColor = 'rgba(255, 0, 0, 0.3)';
+                throw error;
+            }
+        }
+        
+        // Auto-load CSV files when page loads
+        async function loadData() {
+            try {
+                // Load IS data (sample)
+                const isCsvText = await loadCSVFile('listOfTrades_IS.csv');
+                const isData = Papa.parse(isCsvText, {
+                    header: true,
+                    dynamicTyping: true,
+                    skipEmptyLines: true
+                }).data;
+                
+                // Load OOS data (live)
+                const oosCsvText = await loadCSVFile('listOfTrades_OOS.csv');
+                const oosData = Papa.parse(oosCsvText, {
+                    header: true,
+                    dynamicTyping: true,
+                    skipEmptyLines: true
+                }).data;
+                
+                // Process the data
+                processData(isData, oosData);
+            } catch (error) {
+                // Show sample data if loading fails
+                console.log("Loading sample data instead...");
+                showSampleData();
+            }
+        }
+        
+        function showSampleData() {
+            const sampleDates = [];
+            const sampleISData = [];
+            const sampleOOSData = [];
+            let currentBalance = 10000;
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const transitionYear = 2022;
+            const transitionMonth = 6; // July
+            let transitionIndex = -1;
+            
+            // Generate sample IS data
+            for (let year = 2020; year <= 2023; year++) {
+                const endMonth = (year === 2023) ? 4 : 11;
+                for (let month = 0; month <= endMonth; month++) {
+                    const dateLabel = `${months[month]}-${year}`;
+                    sampleDates.push(dateLabel);
+                    
+                    // Check if this is the transition point
+                    if (year === transitionYear && month === transitionMonth) {
+                        transitionIndex = sampleDates.length - 1;
+                    }
+                    
+                    // Generate simulated balance changes
+                    if (year < transitionYear || (year === transitionYear && month <= transitionMonth)) {
+                        // IS data period
+                        const increase = currentBalance * (0.01 + Math.random() * 0.03);
+                        currentBalance += increase;
+                        // Add some volatility
+                        currentBalance += (Math.random() - 0.5) * 5000;
+                        
+                        sampleISData.push(currentBalance);
+                        sampleOOSData.push(null);
+                    } else {
+                        // OOS data period
+                        sampleISData.push(null);
+                        
+                        const increase = currentBalance * (0.015 + Math.random() * 0.035);
+                        currentBalance += increase;
+                        // Add some volatility
+                        currentBalance += (Math.random() - 0.4) * 7000;
+                        
+                        sampleOOSData.push(currentBalance);
+                    }
+                }
+            }
+            
+            // Initialize chart with sample data
+            // Make sure we have filled OOS data from the transition point
+            for (let i = 0; i <= transitionIndex; i++) {
+                sampleOOSData[i] = null;
+            }
+            
+            initChart(sampleDates, [], [], sampleISData, sampleOOSData, transitionIndex);
+            
+            // Update loading status
+            document.getElementById('loading-status').textContent = 'Using sample data (CSV files not found)';
+            document.getElementById('loading-status').style.backgroundColor = 'rgba(255, 165, 0, 0.3)';
+        }
+        
+        // Start loading data when the page is fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+        });
+    </script>
+</body>
+</html>
